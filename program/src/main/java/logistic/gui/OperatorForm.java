@@ -1,9 +1,5 @@
 package logistic.gui;
 
-/**
- * Created by bodrik on 24.11.16.
- */
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -23,18 +19,18 @@ public class OperatorForm {
     }
 
     public void render() {
-        this.primaryStage.setTitle("Logistic system: перевозчик");
+        this.primaryStage.setTitle("Logistic system: оператор");
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(this.mainClass.getClass().getResource("views/CarrierForm.fxml"));
-            loader.setController(new CarrierFormController());
+            loader.setLocation(this.mainClass.getClass().getResource("views/OperatorForm.fxml"));
+            loader.setController(new OperatorFormController());
             rootLayout = (VBox) loader.load();
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.show();
 
-            CarrierFormController controller = loader.getController();
+            OperatorFormController controller = loader.getController();
             controller.setGeneralVariable(mainClass, primaryStage);
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,14 +7,14 @@ package logistic.gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 
 public class ClientForm {
     private Stage primaryStage;
-    private AnchorPane rootLayout;
+    private VBox rootLayout;
     private Application mainClass;
 
     public ClientForm(Stage primaryStage, Application mainClass) {
@@ -23,18 +23,18 @@ public class ClientForm {
     }
 
     public void render() {
-        this.primaryStage.setTitle("Форма входа");
+        this.primaryStage.setTitle("Logistic system: заказчик");
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(this.mainClass.getClass().getResource("views/LoginForm.fxml"));
-            loader.setController(new LoginFormController());
-            rootLayout = (AnchorPane) loader.load();
+            loader.setLocation(this.mainClass.getClass().getResource("views/ClientForm.fxml"));
+            loader.setController(new ClientFormController());
+            rootLayout = (VBox) loader.load();
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.show();
 
-            LoginFormController controller = loader.getController();
+            ClientFormController controller = loader.getController();
             controller.setGeneralVariable(mainClass, primaryStage);
         } catch (IOException e) {
             e.printStackTrace();

@@ -4,14 +4,12 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import logistic.facade.CarrierFacade;
 import logistic.facade.ClientFacade;
+import logistic.models.Calendar;
 import logistic.models.City;
 import logistic.models.Order;
 import logistic.models.User;
@@ -29,6 +27,14 @@ public class CarrierFormController {
     @FXML
     private TextField phone;
     @FXML
+    private TextField width;
+    @FXML
+    private TextField height;
+    @FXML
+    private TextField length;
+    @FXML
+    private TextField maxweight;
+    @FXML
     private TextField lengthNewOrder;
     @FXML
     private TextField widthNewOrder;
@@ -37,9 +43,7 @@ public class CarrierFormController {
     @FXML
     private TextField weightNewOrder;
     @FXML
-    private ComboBox cityNewOrder1;
-    @FXML
-    private ComboBox cityNewOrder2;
+    private ComboBox cityListCalendar;
     @FXML
     private TextField addressNewOrder1;
     @FXML
@@ -48,6 +52,12 @@ public class CarrierFormController {
     private TextField recipientNameNewOrder;
     @FXML
     private TextField recipientPhoneNewOrder;
+    @FXML
+    private TableView<Calendar> calendarTable;
+    @FXML
+    private TableColumn<Calendar, String> dateCalendar;
+    @FXML
+    private TableColumn<Calendar, String> cityCalendar;
     @FXML
     private TableView<Order> listOrders;
     @FXML
@@ -62,7 +72,9 @@ public class CarrierFormController {
     @FXML
     private Button saveProfileBtn;
     @FXML
-    private Button newOrderBtn;
+    private Button saveCalendarBtn;
+    @FXML
+    private Button changeStateToDeliveredBtn;
 
 
     private Application mainClass;
@@ -84,6 +96,17 @@ public class CarrierFormController {
     private void initialize() {
         this.loadProfile();
         this.fillCitiesLists();
+        this.showListOrders();
+        this.showCalendar();
+
+        calendarTable.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> selectCalendar(newValue)
+        );
+
+        listOrders.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> selectOrder(newValue)
+        );
+
     }
 
     public void setGeneralVariable(Application mainClass, Stage mainStage) {
@@ -94,9 +117,9 @@ public class CarrierFormController {
     public void fillCitiesLists() {
         ObservableList<City> obCities = FXCollections.observableArrayList();
         List<City> cities = CitiesRepository.getInstance().getAll();
+        obCities.add(0, new City());
         obCities.addAll(cities);
-        this.cityNewOrder1.setItems(obCities);
-        this.cityNewOrder2.setItems(obCities);
+        this.cityListCalendar.setItems(obCities);
     }
 
     // Обработчики событий
@@ -105,8 +128,12 @@ public class CarrierFormController {
         currentUser.setEmail(email.getText());
         currentUser.setPhone(phone.getText());
         currentUser.setName(fullName.getText());
+        currentUser.setMaxWeight(Double.parseDouble(maxweight.getText()));
+        currentUser.setWidth(Double.parseDouble(width.getText()));
+        currentUser.setHeight(Double.parseDouble(height.getText()));
+        currentUser.setLength(Double.parseDouble(length.getText()));
         currentUser.save();
-        JOptionPane.showMessageDialog(null, "Данные сохранены");
+        JOptionPane.showMessageDialog(null, "Профиль сохранён");
     }
 
     public void loadProfile() {
@@ -114,32 +141,61 @@ public class CarrierFormController {
         email.setText(currentUser.getEmail());
         fullName.setText(currentUser.getName());
         phone.setText(currentUser.getPhone());
+        maxweight.setText(String.valueOf(currentUser.getMaxWeight()));
+        width.setText(String.valueOf(currentUser.getWidth()));
+        height.setText(String.valueOf(currentUser.getHeight()));
+        length.setText(String.valueOf(currentUser.getLength()));
     }
 
-    public void createOrder() {
-        ClientFacade.createOrder(
-                Double.parseDouble(weightNewOrder.getText()),
-                Double.parseDouble(widthNewOrder.getText()),
-                Double.parseDouble(heightNewOrder.getText()),
-                Double.parseDouble(lengthNewOrder.getText()),
-                (City) cityNewOrder1.getValue(),
-                addressNewOrder1.getText(),
-                (City) cityNewOrder2.getValue(),
-                addressNewOrder2.getText(),
-                recipientNameNewOrder.getText(),
-                recipientPhoneNewOrder.getText()
-        );
-        JOptionPane.showMessageDialog(null, "Создан новый заказ");
+    public void showCalendar() {
+        ObservableList<Calendar> obCalendar = FXCollections.observableArrayList();
+        obCalendar.addAll(CarrierFacade.getMyCalendar());
+        calendarTable.setItems(obCalendar);
+        dateCalendar.setCellValueFactory(new PropertyValueFactory<Calendar, String>("date"));
+        cityCalendar.setCellValueFactory(new PropertyValueFactory<Calendar, String>("cityName"));
+    }
+
+    public void selectCalendar(Calendar calendar) {
+        if (calendar.getCityId() == 0) {
+            cityListCalendar.getSelectionModel().select(0);
+        } else {
+            City city = CitiesRepository.getInstance().getById(calendar.getCityId());
+            cityListCalendar.getSelectionModel().select(city);
+        }
+    }
+
+    public void saveCalendar() {
+        Calendar calendar = calendarTable.getSelectionModel().getSelectedItem();
+        City city = (City)cityListCalendar.getSelectionModel().getSelectedItem();
+        calendar.setCityId(city.getId());
+        calendar.save();
+        calendarTable.refresh();
     }
 
     public void showListOrders() {
         ObservableList<Order> obOrders = FXCollections.observableArrayList();
-        obOrders.addAll(ClientFacade.getMyOrder());
+        obOrders.addAll(CarrierFacade.getMyOrder());
         listOrders.setItems(obOrders);
-        numberOrder.setCellValueFactory(new PropertyValueFactory<Order,String>("id"));
+        numberOrder.setCellValueFactory(new PropertyValueFactory<Order, String>("id"));
         creationDate.setCellValueFactory(new PropertyValueFactory<Order, String>("dateCreate"));
         statusOrder.setCellValueFactory(new PropertyValueFactory<Order, String>("statusName"));
         detailsOrder.setCellValueFactory(new PropertyValueFactory<Order, String>("details"));
+    }
+
+    public void selectOrder(Order order) {
+        if (order.getStatus() == Order.STATUS_IN_TRANSIT) {
+            changeStateToDeliveredBtn.setDisable(false);
+        } else {
+            changeStateToDeliveredBtn.setDisable(true);
+        }
+    }
+
+    public void changeStateToDelivered() {
+        Order order = listOrders.getSelectionModel().getSelectedItem();
+        order.setStatus(Order.STATUS_DELIVERED);
+        order.save();
+        listOrders.refresh();
+        changeStateToDeliveredBtn.setDisable(true);
     }
 
     public void terminate() {

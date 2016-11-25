@@ -12,12 +12,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class LoginFormController {
+public class LoginForm {
     private Stage primaryStage;
     private AnchorPane rootLayout;
     private Application mainClass;
 
-    public LoginFormController(Stage primaryStage, Application mainClass) {
+    public LoginForm(Stage primaryStage, Application mainClass) {
         this.primaryStage = primaryStage;
         this.mainClass = mainClass;
     }
@@ -27,13 +27,15 @@ public class LoginFormController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.mainClass.getClass().getResource("views/LoginForm.fxml"));
+            loader.setController(new LoginFormController());
             rootLayout = (AnchorPane) loader.load();
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.show();
 
-
+            LoginFormController controller = loader.getController();
+            controller.setGeneralVariable(mainClass, primaryStage);
         } catch (IOException e) {
             e.printStackTrace();
         }

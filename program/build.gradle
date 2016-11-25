@@ -1,4 +1,4 @@
-group 'ls1'
+group 'logistic'
 version '1.0'
 
 apply plugin: 'java'
@@ -17,4 +17,8 @@ jar {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'org.sql2o', name: 'sql2o', version: '1.5.4'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.39'
+    compile 'org.ini4j:ini4j:0.5.2'
+    compile 'com.intellij:forms_rt:6.0.5'
 }

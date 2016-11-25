@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import logistic.models.Carrier;
 
 import java.io.IOException;
 
@@ -23,18 +24,18 @@ public class CarrierForm {
     }
 
     public void render() {
-        this.primaryStage.setTitle("Logistic system client");
+        this.primaryStage.setTitle("Logistic system: перевозчик");
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(this.mainClass.getClass().getResource("views/ClientForm.fxml"));
-            loader.setController(new ClientFormController());
+            loader.setLocation(this.mainClass.getClass().getResource("views/CarrierForm.fxml"));
+            loader.setController(new CarrierFormController());
             rootLayout = (VBox) loader.load();
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.show();
 
-            ClientFormController controller = loader.getController();
+            CarrierFormController controller = loader.getController();
             controller.setGeneralVariable(mainClass, primaryStage);
         } catch (IOException e) {
             e.printStackTrace();

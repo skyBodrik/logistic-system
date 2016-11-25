@@ -1,7 +1,17 @@
 package logistic.gui;
 
+import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+import logistic.facade.CarrierFacade;
+import logistic.facade.ClientFacade;
+import logistic.facade.OperatorFacade;
+import logistic.models.Carrier;
+import logistic.models.Client;
+import logistic.models.Operator;
+import logistic.models.User;
+import logistic.repositories.UsersRepository;
 
 import javax.swing.*;
 
@@ -17,13 +27,15 @@ public class LoginFormController {
     private Button entryBtn;
 
 
-    private MainApp mainApp;
+    private Application mainClass;
+
+    private Stage primaryStage;
 
     /**
      * Конструктор.
      * Конструктор вызывается раньше метода initialize().
      */
-    public PersonOverviewController() {
+    public LoginFormController() {
     }
 
     /**
@@ -32,24 +44,60 @@ public class LoginFormController {
      */
     @FXML
     private void initialize() {
-        // Инициализация таблицы адресатов с двумя столбцами.
-/*        firstNameColumn.setCellValueFactory(cellData -> cellData.getValue().firstNameProperty());
-        lastNameColumn.setCellValueFactory(cellData -> cellData.getValue().lastNameProperty());*/
+
     }
 
-    /**
-     * Вызывается главным приложением, которое даёт на себя ссылку.
-     *
-     * @param mainApp
-     */
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
-
-        // Добавление в таблицу данных из наблюдаемого списка
-        //personTable.setItems(mainApp.getPersonData());
+    public void setGeneralVariable(Application mainClass, Stage mainStage) {
+        this.mainClass = mainClass;
+        this.primaryStage = mainStage;
     }
+
+    // Геттеры и сеттеры
+
+    public String getEmail() {
+        return email.getText();
+    }
+
+    public void setEmail(String email) {
+        this.email.setText(email);
+    }
+
+    public String getPassword() {
+        return password.getText();
+    }
+
+    public void setPassword(String password) {
+        this.password.setText(password);
+    }
+
+    // Обработчики событий
 
     public void login() {
-        JOptionPane.showMessageDialog(null, 'тест');
+        UsersRepository repo = UsersRepository.getInstance();
+        User currentUser = repo.getByEmailAndPassword(
+                this.getEmail(),
+                this.getPassword()
+        );
+        if (currentUser == null) {
+            JOptionPane.showMessageDialog(null, "Ошибка входа. Неверные email или пароль.");
+        } else {
+            primaryStage.hide();
+            JOptionPane.showMessageDialog(null, "Здравствуйте, " + currentUser.getName() + "!");
+            repo.setCurrentUserObject(currentUser);
+            if (currentUser instanceof Client) {
+                ClientFacade clientFacade = new ClientFacade();
+                clientFacade.showMainWindow(this.mainClass, this.primaryStage);
+            } else if (currentUser instanceof Carrier) {
+                CarrierFacade carrierFacade = new CarrierFacade();
+                carrierFacade.showMainWindow(this.mainClass, this.primaryStage);
+            } else if (currentUser instanceof Operator) {
+                OperatorFacade operatorFacade = new OperatorFacade();
+                operatorFacade.showMainWindow(this.mainClass, this.primaryStage);
+            }
+        };
+    }
+
+    public void exit() {
+        primaryStage.close();
     }
 }

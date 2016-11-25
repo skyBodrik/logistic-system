@@ -1,10 +1,23 @@
 import java.io.IOException;
 import java.lang.String;
-import java.lang.System;
 
-class Main {
+import javafx.application.Application;
+import javafx.stage.Stage;
+import logistic.gui.LoginForm;
+
+public class Main extends Application {
+    protected Stage primaryStage;
+
+    @Override
+    public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+
+        LoginForm loginForm = new LoginForm(primaryStage, this);
+        loginForm.render();
+    }
+
     public static void main(String[] args) throws IOException
     {
-        System.out.print("Hi, Igor!");
+        launch(args);
     }
 }

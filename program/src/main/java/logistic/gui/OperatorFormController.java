@@ -7,16 +7,19 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import logistic.facade.CarrierFacade;
+import logistic.facade.OperatorFacade;
 import logistic.models.Calendar;
-import logistic.models.City;
 import logistic.models.Order;
 import logistic.models.User;
-import logistic.repositories.CitiesRepository;
 import logistic.repositories.UsersRepository;
 
+import javax.lang.model.element.NestingKind;
 import javax.swing.*;
+import javax.swing.text.html.Option;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class OperatorFormController {
     @FXML
@@ -26,37 +29,13 @@ public class OperatorFormController {
     @FXML
     private TextField phone;
     @FXML
-    private TextField width;
-    @FXML
-    private TextField height;
-    @FXML
-    private TextField length;
-    @FXML
-    private TextField maxweight;
-    @FXML
-    private TextField lengthNewOrder;
-    @FXML
-    private TextField widthNewOrder;
-    @FXML
-    private TextField heightNewOrder;
-    @FXML
-    private TextField weightNewOrder;
-    @FXML
-    private ComboBox cityListCalendar;
-    @FXML
-    private TextField addressNewOrder1;
-    @FXML
-    private TextField addressNewOrder2;
-    @FXML
-    private TextField recipientNameNewOrder;
-    @FXML
-    private TextField recipientPhoneNewOrder;
+    private TextField costOrder;
     @FXML
     private TableView<Calendar> calendarTable;
     @FXML
     private TableColumn<Calendar, String> dateCalendar;
     @FXML
-    private TableColumn<Calendar, String> cityCalendar;
+    private TableColumn<Calendar, String> detailsCalendar;
     @FXML
     private TableView<Order> listOrders;
     @FXML
@@ -67,13 +46,17 @@ public class OperatorFormController {
     private TableColumn<Order, String> statusOrder;
     @FXML
     private TableColumn<Order, String> detailsOrder;
+    @FXML
+    private ComboBox statusesList;
+    @FXML
+    private ComboBox carrierList;
 
     @FXML
     private Button saveProfileBtn;
     @FXML
     private Button saveCalendarBtn;
     @FXML
-    private Button changeStateToDeliveredBtn;
+    private Button saveOrderBtn;
 
 
     private Application mainClass;
@@ -94,9 +77,10 @@ public class OperatorFormController {
     @FXML
     private void initialize() {
         this.loadProfile();
-        this.fillCitiesLists();
         this.showListOrders();
         this.showCalendar();
+        this.fillStatusesLists();
+        this.fillCarriersLists();
 
         calendarTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> selectCalendar(newValue)
@@ -106,19 +90,32 @@ public class OperatorFormController {
                 (observable, oldValue, newValue) -> selectOrder(newValue)
         );
 
+        statusesList.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> selectStatus(newValue)
+        );
+
+        carrierList.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> selectCarrier((User) newValue)
+        );
+
+    }
+
+    public void fillStatusesLists() {
+        ObservableList<String> obStatuses = FXCollections.observableArrayList();
+        Collections.addAll(obStatuses, Order.statusNames);
+        this.statusesList.setItems(obStatuses);
+    }
+
+    public void fillCarriersLists() {
+        ObservableList<User> obCities = FXCollections.observableArrayList();
+        List<User> users = OperatorFacade.getCarriers();
+        obCities.addAll(users);
+        this.carrierList.setItems(obCities);
     }
 
     public void setGeneralVariable(Application mainClass, Stage mainStage) {
         this.mainClass = mainClass;
         this.primaryStage = mainStage;
-    }
-
-    public void fillCitiesLists() {
-        ObservableList<City> obCities = FXCollections.observableArrayList();
-        List<City> cities = CitiesRepository.getInstance().getAll();
-        obCities.add(0, new City());
-        obCities.addAll(cities);
-        this.cityListCalendar.setItems(obCities);
     }
 
     // Обработчики событий
@@ -127,10 +124,6 @@ public class OperatorFormController {
         currentUser.setEmail(email.getText());
         currentUser.setPhone(phone.getText());
         currentUser.setName(fullName.getText());
-        currentUser.setMaxWeight(Double.parseDouble(maxweight.getText()));
-        currentUser.setWidth(Double.parseDouble(width.getText()));
-        currentUser.setHeight(Double.parseDouble(height.getText()));
-        currentUser.setLength(Double.parseDouble(length.getText()));
         currentUser.save();
         JOptionPane.showMessageDialog(null, "Профиль сохранён");
     }
@@ -140,40 +133,23 @@ public class OperatorFormController {
         email.setText(currentUser.getEmail());
         fullName.setText(currentUser.getName());
         phone.setText(currentUser.getPhone());
-        maxweight.setText(String.valueOf(currentUser.getMaxWeight()));
-        width.setText(String.valueOf(currentUser.getWidth()));
-        height.setText(String.valueOf(currentUser.getHeight()));
-        length.setText(String.valueOf(currentUser.getLength()));
     }
 
     public void showCalendar() {
         ObservableList<Calendar> obCalendar = FXCollections.observableArrayList();
-        obCalendar.addAll(CarrierFacade.getMyCalendar());
+        obCalendar.addAll(OperatorFacade.getCalendar());
         calendarTable.setItems(obCalendar);
         dateCalendar.setCellValueFactory(new PropertyValueFactory<Calendar, String>("date"));
-        cityCalendar.setCellValueFactory(new PropertyValueFactory<Calendar, String>("cityName"));
+        detailsCalendar.setCellValueFactory(new PropertyValueFactory<Calendar, String>("details"));
     }
 
     public void selectCalendar(Calendar calendar) {
-        if (calendar.getCityId() == 0) {
-            cityListCalendar.getSelectionModel().select(0);
-        } else {
-            City city = CitiesRepository.getInstance().getById(calendar.getCityId());
-            cityListCalendar.getSelectionModel().select(city);
-        }
-    }
 
-    public void saveCalendar() {
-        Calendar calendar = calendarTable.getSelectionModel().getSelectedItem();
-        City city = (City)cityListCalendar.getSelectionModel().getSelectedItem();
-        calendar.setCityId(city.getId());
-        calendar.save();
-        calendarTable.refresh();
     }
 
     public void showListOrders() {
         ObservableList<Order> obOrders = FXCollections.observableArrayList();
-        obOrders.addAll(CarrierFacade.getMyOrder());
+        obOrders.addAll(OperatorFacade.getOrders());
         listOrders.setItems(obOrders);
         numberOrder.setCellValueFactory(new PropertyValueFactory<Order, String>("id"));
         creationDate.setCellValueFactory(new PropertyValueFactory<Order, String>("dateCreate"));
@@ -182,20 +158,39 @@ public class OperatorFormController {
     }
 
     public void selectOrder(Order order) {
-        if (order.getStatus() == Order.STATUS_IN_TRANSIT) {
-            changeStateToDeliveredBtn.setDisable(false);
+        statusesList.getSelectionModel().select(order.getStatus());
+        carrierList.getSelectionModel().select(UsersRepository.getInstance().getById(order.getCarrierId()));
+        if (order.getCost() == 0) {
+            costOrder.setText("0.00");
         } else {
-            changeStateToDeliveredBtn.setDisable(true);
+            costOrder.setText(String.valueOf(order.getCost()));
         }
+        saveOrderBtn.setDisable(true);
     }
 
-    public void changeStateToDelivered() {
+    public void saveOrder() {
         Order order = listOrders.getSelectionModel().getSelectedItem();
-        order.setStatus(Order.STATUS_DELIVERED);
+        User user = (User)Optional.ofNullable(carrierList.getSelectionModel().getSelectedItem()).orElse(new User());
+        order.setStatus(statusesList.getSelectionModel().getSelectedIndex());
+        order.setCost(Double.parseDouble(costOrder.getText()));
+        order.setCarrierId(user.getId());
         order.save();
         listOrders.refresh();
-        changeStateToDeliveredBtn.setDisable(true);
+        saveOrderBtn.setDisable(true);
     }
+
+    public void selectStatus(Object status) {
+        saveOrderBtn.setDisable(false);
+    }
+
+    public void selectCarrier(User user) {
+        saveOrderBtn.setDisable(false);
+    }
+
+    public void changeCostOrder() {
+        saveOrderBtn.setDisable(false);
+    }
+
 
     public void terminate() {
         primaryStage.close();

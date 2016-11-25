@@ -1,26 +1,76 @@
 package logistic.gui;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import logistic.facade.ClientFacade;
-import logistic.models.Client;
+import logistic.models.City;
+import logistic.models.Order;
 import logistic.models.User;
+import logistic.repositories.CitiesRepository;
+import logistic.repositories.OrdersRepository;
 import logistic.repositories.UsersRepository;
 
 import javax.swing.*;
+import javax.swing.text.StringContent;
+import java.util.List;
 
 public class ClientFormController {
     @FXML
     private TextField email;
     @FXML
-    private PasswordField password;
+    private TextField fullName;
+    @FXML
+    private TextField phone;
+    @FXML
+    private TextField lengthNewOrder;
+    @FXML
+    private TextField widthNewOrder;
+    @FXML
+    private TextField heightNewOrder;
+    @FXML
+    private TextField weightNewOrder;
+    @FXML
+    private ComboBox cityNewOrder1;
+    @FXML
+    private ComboBox cityNewOrder2;
+    @FXML
+    private TextField addressNewOrder1;
+    @FXML
+    private TextField addressNewOrder2;
+    @FXML
+    private TextField recipientNameNewOrder;
+    @FXML
+    private TextField recipientPhoneNewOrder;
+    @FXML
+    private TableView<Order> listOrders;
+    @FXML
+    private TableColumn<Order, String> numberOrder;
+    @FXML
+    private TableColumn<Order, String> creationDate;
+    @FXML
+    private TableColumn<Order, String> statusOrder;
+    @FXML
+    private TableColumn<Order, String> detailsOrder;
 
     @FXML
-    private Button closeBtn;
+    private Button saveProfileBtn;
     @FXML
-    private Button entryBtn;
+    private Button newOrderBtn;
 
 
     private Application mainClass;
@@ -40,7 +90,8 @@ public class ClientFormController {
      */
     @FXML
     private void initialize() {
-
+        this.loadProfile();
+        this.fillCitiesLists();
     }
 
     public void setGeneralVariable(Application mainClass, Stage mainStage) {
@@ -48,47 +99,59 @@ public class ClientFormController {
         this.primaryStage = mainStage;
     }
 
-    // Геттеры и сеттеры
-
-    public String getEmail() {
-        return email.getText();
-    }
-
-    public void setEmail(String email) {
-        this.email.setText(email);
-    }
-
-    public String getPassword() {
-        return password.getText();
-    }
-
-    public void setPassword(String password) {
-        this.password.setText(password);
+    public void fillCitiesLists() {
+        ObservableList<City> obCities = FXCollections.observableArrayList();
+        List<City> cities = CitiesRepository.getInstance().getAll();
+        obCities.addAll(cities);
+        this.cityNewOrder1.setItems(obCities);
+        this.cityNewOrder2.setItems(obCities);
     }
 
     // Обработчики событий
-
-    public void login() {
-        UsersRepository repo = UsersRepository.getInstance();
-        User currentUser = repo.getByEmailAndPassword(
-                this.getEmail(),
-                this.getPassword()
-        );
-        if (currentUser == null) {
-            JOptionPane.showMessageDialog(null, "Ошибка входа. Неверные email или пароль.");
-        } else {
-            primaryStage.hide();
-            JOptionPane.showMessageDialog(null, "Здравствуйте, " + currentUser.getName() + "!");
-            if (currentUser instanceof Client) {
-                repo.setCurrentUserObject(currentUser);
-                ClientFacade clientFacade = new ClientFacade(this.mainClass, this.primaryStage);
-                clientFacade.showMainWindow();
-            }
-
-        };
+    public void saveProfile() {
+        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        currentUser.setEmail(email.getText());
+        currentUser.setPhone(phone.getText());
+        currentUser.setName(fullName.getText());
+        currentUser.save();
+        JOptionPane.showMessageDialog(null, "Данные сохранены");
     }
 
-    public void exit() {
+    public void loadProfile() {
+        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        email.setText(currentUser.getEmail());
+        fullName.setText(currentUser.getName());
+        phone.setText(currentUser.getPhone());
+    }
+
+    public void createOrder() {
+        ClientFacade.createOrder(
+                Double.parseDouble(weightNewOrder.getText()),
+                Double.parseDouble(widthNewOrder.getText()),
+                Double.parseDouble(heightNewOrder.getText()),
+                Double.parseDouble(lengthNewOrder.getText()),
+                (City) cityNewOrder1.getValue(),
+                addressNewOrder1.getText(),
+                (City) cityNewOrder2.getValue(),
+                addressNewOrder2.getText(),
+                recipientNameNewOrder.getText(),
+                recipientPhoneNewOrder.getText()
+        );
+        JOptionPane.showMessageDialog(null, "Создан новый заказ");
+    }
+
+    public void showListOrders() {
+        ObservableList<Order> obOrders = FXCollections.observableArrayList();
+        obOrders.addAll(ClientFacade.getMyOrder());
+        listOrders.setItems(obOrders);
+        numberOrder.setCellValueFactory(new PropertyValueFactory<Order,String>("id"));
+        creationDate.setCellValueFactory(new PropertyValueFactory<Order, String>("dateCreate"));
+        statusOrder.setCellValueFactory(new PropertyValueFactory<Order, String>("statusName"));
+        detailsOrder.setCellValueFactory(new PropertyValueFactory<Order, String>("details"));
+    }
+
+    public void terminate() {
         primaryStage.close();
     }
+
 }
