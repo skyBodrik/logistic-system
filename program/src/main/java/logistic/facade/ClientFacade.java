@@ -8,6 +8,7 @@ import logistic.models.Order;
 import logistic.models.User;
 import logistic.repositories.OrdersRepository;
 import logistic.repositories.UsersRepository;
+import logistic.services.Acquiring;
 
 
 import java.util.List;
@@ -42,5 +43,15 @@ public class ClientFacade {
     public static List<Order> getMyOrder() {
         User currentUser = UsersRepository.getInstance().getCurrentUserObject();
         return OrdersRepository.getInstance().getAllByClient(currentUser);
+    }
+
+    public static boolean toPay(Order order) {
+        Acquiring ac = new Acquiring();
+        if (ac.toPay()) {
+            order.setStatus(Order.STATUS_PAID_WAITING_TO_DISPATCH);
+            order.save();
+            return true;
+        }
+        return false;
     }
 }

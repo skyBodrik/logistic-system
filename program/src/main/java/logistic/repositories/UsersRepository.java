@@ -8,8 +8,6 @@ import logistic.models.User;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.security.MessageDigest;
 
@@ -71,5 +69,17 @@ public class UsersRepository {
 
     public User getCurrentUserObject() {
         return this.currentUserObject;
+    }
+
+    public User createClient(String name, String email, String password, String phone) {
+        return new Client(name, email, this.md5Convert(password), phone);
+    }
+
+    public User createCarrier(String name, String email, String password, String phone) {
+        return new Carrier(name, email, this.md5Convert(password), phone, 0, 0, 0, 0);
+    }
+
+    public User createOperator(String name, String email, String password, String phone) {
+        return new Operator(name, email, this.md5Convert(password), phone);
     }
 }

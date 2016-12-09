@@ -1,0 +1,5 @@
+{
+    operation: 'payment',
+    code: 2,
+    message: 'Sorry... we have some problems with your money transaction.'
+}

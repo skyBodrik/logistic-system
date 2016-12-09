@@ -32,7 +32,10 @@ public class OperatorFacade {
     public static List<Calendar> getCalendar() {
         User currentUser = UsersRepository.getInstance().getCurrentUserObject();
         List<Calendar> calendar = CalendarMapper.getAll();
-        return calendar.stream().sorted((l, p) -> l.getDate().compareTo(p.getDate())).collect(Collectors.toList());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+        long startDate = System.currentTimeMillis();
+        String d = dateFormat.format(new java.util.Date(startDate));
+        return calendar.stream().sorted((l, p) -> l.getDate().compareTo(p.getDate())).filter(p -> p.getDate().compareTo(d) >= 0).collect(Collectors.toList());
     }
 
     public static List<User> getCarriers() {

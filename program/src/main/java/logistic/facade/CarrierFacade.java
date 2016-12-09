@@ -41,6 +41,9 @@ public class CarrierFacade {
             }
             startDate += 86400000;
         }
-        return calendar.stream().sorted((l, p) -> l.getDate().compareTo(p.getDate())).collect(Collectors.toList());
+        dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+        startDate = System.currentTimeMillis();
+        String d = dateFormat.format(new java.util.Date(startDate));
+        return calendar.stream().sorted((l, p) -> l.getDate().compareTo(p.getDate())).filter(p -> p.getDate().compareTo(d) >= 0).collect(Collectors.toList());
     }
 }

@@ -17,6 +17,13 @@ import javax.swing.*;
 
 public class LoginFormController {
     @FXML
+    private TabPane mainPaneTabs;
+    @FXML
+    private Tab tabLogin;
+    @FXML
+    private Tab tabReg;
+
+    @FXML
     private TextField email;
     @FXML
     private PasswordField password;
@@ -25,6 +32,27 @@ public class LoginFormController {
     private Button closeBtn;
     @FXML
     private Button entryBtn;
+
+    // New user
+    @FXML
+    private RadioButton clientRole;
+    @FXML
+    private RadioButton carrierRole;
+    @FXML
+    private RadioButton operatorRole;
+    @FXML
+    private TextField nameNew;
+    @FXML
+    private TextField emailNew;
+    @FXML
+    private TextField phoneNew;
+    @FXML
+    private PasswordField passwordNew;
+    @FXML
+    private PasswordField repeatPasswordNew;
+    @FXML
+    private Button createUserBtn;
+
 
 
     private Application mainClass;
@@ -99,5 +127,39 @@ public class LoginFormController {
 
     public void exit() {
         primaryStage.close();
+    }
+
+    public void createNewUser() {
+        if (!passwordNew.getText().equals(repeatPasswordNew.getText())) {
+            JOptionPane.showMessageDialog(null, "Пароли не совпадают!");
+            return;
+        }
+        if (nameNew.getText().length() < 1) {
+            JOptionPane.showMessageDialog(null, "Неверно введенёно имя");
+            return;
+        }
+        if (emailNew.getText().length() < 1) {
+            JOptionPane.showMessageDialog(null, "Неверно введенён email");
+            return;
+        }
+        if (phoneNew.getText().length() < 1) {
+            JOptionPane.showMessageDialog(null, "Не введён номер телефона");
+            return;
+        }
+        if (passwordNew.getText().length() < 1) {
+            JOptionPane.showMessageDialog(null, "Не введён пароль");
+            return;
+        }
+        UsersRepository rep = UsersRepository.getInstance();
+        if (this.clientRole.selectedProperty().getValue()) {   // Создаём клиента
+            rep.createClient(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
+        } else if (this.carrierRole.selectedProperty().getValue()) {    // Создаём перевозчика
+            rep.createCarrier(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
+        } else if (this.operatorRole.selectedProperty().getValue()) {    // Создаём оператора
+            rep.createOperator(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
+        }
+        JOptionPane.showMessageDialog(null, "Пользователь успешно создан. Войдите в систему.");
+        this.mainPaneTabs.getSelectionModel().select(0);
+        this.tabReg.setDisable(true);
     }
 }

@@ -1,0 +1,5 @@
+{
+    operation: 'payment',
+    code: 0,
+    message: 'Payment has been success!'
+}

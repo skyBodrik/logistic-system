@@ -71,6 +71,8 @@ public class ClientFormController {
     private Button saveProfileBtn;
     @FXML
     private Button newOrderBtn;
+    @FXML
+    private Button toPayBtn;
 
 
     private Application mainClass;
@@ -92,6 +94,10 @@ public class ClientFormController {
     private void initialize() {
         this.loadProfile();
         this.fillCitiesLists();
+
+        listOrders.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> selectOrder(newValue)
+        );
     }
 
     public void setGeneralVariable(Application mainClass, Stage mainStage) {
@@ -152,6 +158,22 @@ public class ClientFormController {
 
     public void terminate() {
         primaryStage.close();
+    }
+
+    public void toPayEvent() {
+        if (ClientFacade.toPay(this.listOrders.getSelectionModel().getSelectedItem())) {
+            JOptionPane.showMessageDialog(null, "Заказ успешно оплачен!");
+        } else {
+            JOptionPane.showMessageDialog(null, "При оплате заказа произошла ошибка.");
+        }
+    }
+
+    public void selectOrder(Order order) {
+        if (order.getStatus() == Order.STATUS_WAITING_PAYMENT) {
+            toPayBtn.setDisable(false);
+        } else {
+            toPayBtn.setDisable(true);
+        }
     }
 
 }

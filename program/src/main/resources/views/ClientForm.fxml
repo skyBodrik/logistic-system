@@ -8,7 +8,7 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+<VBox prefHeight="410.0" prefWidth="640.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -19,9 +19,9 @@
         </Menu>
       </menus>
     </MenuBar>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="386.0000999999975" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <children>
-        <TabPane layoutX="0.0" layoutY="0.0" prefHeight="376.0" prefWidth="640.0" tabClosingPolicy="UNAVAILABLE">
+        <TabPane layoutX="0.0" layoutY="0.0" prefHeight="386.0" prefWidth="640.0" tabClosingPolicy="UNAVAILABLE">
           <tabs>
             <Tab text="Профиль">
               <content>
@@ -40,9 +40,9 @@
             </Tab>
             <Tab onSelectionChanged="#showListOrders" text="Список заказов">
               <content>
-                <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="350.0" prefWidth="640.0">
                   <children>
-                    <TableView fx:id="listOrders" layoutX="0.0" layoutY="0.0" prefHeight="340.0" prefWidth="640.0">
+                    <TableView fx:id="listOrders" layoutX="0.0" layoutY="0.0" prefHeight="315.0" prefWidth="640.0">
                       <columns>
                         <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="75.0" text="Номер" fx:id="numberOrder" />
                         <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="136.0" text="Дата создания" fx:id="creationDate" />
@@ -50,6 +50,7 @@
                         <TableColumn maxWidth="5000.0" minWidth="10.0" prefWidth="575.0" text="Детали" fx:id="detailsOrder" />
                       </columns>
                     </TableView>
+                    <Button fx:id="toPayBtn" disable="true" layoutX="531.0" layoutY="321.0" mnemonicParsing="false" onMouseClicked="#toPayEvent" text="Оплатить" />
                   </children>
                 </AnchorPane>
               </content>
