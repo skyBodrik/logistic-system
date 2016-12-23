@@ -5,7 +5,6 @@ import javafx.stage.Stage;
 import logistic.gui.OperatorForm;
 import logistic.mappers.CalendarMapper;
 import logistic.models.Calendar;
-import logistic.models.Operator;
 import logistic.models.Order;
 import logistic.models.User;
 import logistic.repositories.OrdersRepository;

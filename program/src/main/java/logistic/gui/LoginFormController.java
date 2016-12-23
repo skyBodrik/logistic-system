@@ -7,11 +7,11 @@ import javafx.stage.Stage;
 import logistic.facade.CarrierFacade;
 import logistic.facade.ClientFacade;
 import logistic.facade.OperatorFacade;
+import logistic.facade.UserFacade;
 import logistic.models.Carrier;
 import logistic.models.Client;
 import logistic.models.Operator;
 import logistic.models.User;
-import logistic.repositories.UsersRepository;
 
 import javax.swing.*;
 
@@ -101,8 +101,7 @@ public class LoginFormController {
     // Обработчики событий
 
     public void login() {
-        UsersRepository repo = UsersRepository.getInstance();
-        User currentUser = repo.getByEmailAndPassword(
+        User currentUser = UserFacade.login(
                 this.getEmail(),
                 this.getPassword()
         );
@@ -111,7 +110,7 @@ public class LoginFormController {
         } else {
             primaryStage.hide();
             JOptionPane.showMessageDialog(null, "Здравствуйте, " + currentUser.getName() + "!");
-            repo.setCurrentUserObject(currentUser);
+            UserFacade.setLoggedUser(currentUser);
             if (currentUser instanceof Client) {
                 ClientFacade clientFacade = new ClientFacade();
                 clientFacade.showMainWindow(this.mainClass, this.primaryStage);
@@ -150,13 +149,12 @@ public class LoginFormController {
             JOptionPane.showMessageDialog(null, "Не введён пароль");
             return;
         }
-        UsersRepository rep = UsersRepository.getInstance();
         if (this.clientRole.selectedProperty().getValue()) {   // Создаём клиента
-            rep.createClient(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
+            UserFacade.createClient(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
         } else if (this.carrierRole.selectedProperty().getValue()) {    // Создаём перевозчика
-            rep.createCarrier(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
+            UserFacade.createCarrier(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
         } else if (this.operatorRole.selectedProperty().getValue()) {    // Создаём оператора
-            rep.createOperator(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
+            UserFacade.createOperator(this.nameNew.getText(), this.emailNew.getText(), this.passwordNew.getText(), this.phoneNew.getText());
         }
         JOptionPane.showMessageDialog(null, "Пользователь успешно создан. Войдите в систему.");
         this.mainPaneTabs.getSelectionModel().select(0);

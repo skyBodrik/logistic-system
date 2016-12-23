@@ -8,15 +8,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import logistic.facade.OperatorFacade;
+import logistic.facade.UserFacade;
 import logistic.models.Calendar;
 import logistic.models.Order;
 import logistic.models.User;
-import logistic.repositories.UsersRepository;
 
-import javax.lang.model.element.NestingKind;
 import javax.swing.*;
-import javax.swing.text.html.Option;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -120,7 +117,7 @@ public class OperatorFormController {
 
     // Обработчики событий
     public void saveProfile() {
-        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        User currentUser = UserFacade.getLoggedUser();
         currentUser.setEmail(email.getText());
         currentUser.setPhone(phone.getText());
         currentUser.setName(fullName.getText());
@@ -129,7 +126,7 @@ public class OperatorFormController {
     }
 
     public void loadProfile() {
-        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        User currentUser = UserFacade.getLoggedUser();
         email.setText(currentUser.getEmail());
         fullName.setText(currentUser.getName());
         phone.setText(currentUser.getPhone());
@@ -159,7 +156,7 @@ public class OperatorFormController {
 
     public void selectOrder(Order order) {
         statusesList.getSelectionModel().select(order.getStatus());
-        carrierList.getSelectionModel().select(UsersRepository.getInstance().getById(order.getCarrierId()));
+        carrierList.getSelectionModel().select(UserFacade.getById(order.getCarrierId()));
         if (order.getCost() == 0) {
             costOrder.setText("0.00");
         } else {

@@ -1,5 +1,7 @@
 package logistic.models;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import logistic.mappers.CityMapper;
 import logistic.mappers.OrderMapper;
 
@@ -198,6 +200,15 @@ public class Order {
 
     public void setClientId(int clientId) {
         this.clientId = clientId;
+    }
+
+    public String getStatusOrderJson() {
+        JsonObject resultJson = new JsonObject();
+
+        resultJson.add("id", new JsonPrimitive(this.getId()));
+        resultJson.add("statusCode", new JsonPrimitive(this.getStatus()));
+        resultJson.add("statusText", new JsonPrimitive(this.getStatusName()));
+        return resultJson.toString();
     }
 
     public String getDetails() {

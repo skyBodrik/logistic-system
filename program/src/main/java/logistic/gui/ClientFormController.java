@@ -11,22 +11,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import logistic.facade.CityFacade;
 import logistic.facade.ClientFacade;
+import logistic.facade.UserFacade;
 import logistic.models.City;
 import logistic.models.Order;
 import logistic.models.User;
-import logistic.repositories.CitiesRepository;
-import logistic.repositories.OrdersRepository;
-import logistic.repositories.UsersRepository;
 
 import javax.swing.*;
-import javax.swing.text.StringContent;
 import java.util.List;
 
 public class ClientFormController {
@@ -107,7 +99,7 @@ public class ClientFormController {
 
     public void fillCitiesLists() {
         ObservableList<City> obCities = FXCollections.observableArrayList();
-        List<City> cities = CitiesRepository.getInstance().getAll();
+        List<City> cities = CityFacade.getCities();
         obCities.addAll(cities);
         this.cityNewOrder1.setItems(obCities);
         this.cityNewOrder2.setItems(obCities);
@@ -115,7 +107,7 @@ public class ClientFormController {
 
     // Обработчики событий
     public void saveProfile() {
-        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        User currentUser = UserFacade.getLoggedUser();
         currentUser.setEmail(email.getText());
         currentUser.setPhone(phone.getText());
         currentUser.setName(fullName.getText());
@@ -124,7 +116,7 @@ public class ClientFormController {
     }
 
     public void loadProfile() {
-        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        User currentUser = UserFacade.getLoggedUser();
         email.setText(currentUser.getEmail());
         fullName.setText(currentUser.getName());
         phone.setText(currentUser.getPhone());

@@ -8,13 +8,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import logistic.facade.CarrierFacade;
-import logistic.facade.ClientFacade;
+import logistic.facade.CityFacade;
+import logistic.facade.UserFacade;
 import logistic.models.Calendar;
 import logistic.models.City;
 import logistic.models.Order;
 import logistic.models.User;
-import logistic.repositories.CitiesRepository;
-import logistic.repositories.UsersRepository;
 
 import javax.swing.*;
 import java.util.List;
@@ -116,7 +115,7 @@ public class CarrierFormController {
 
     public void fillCitiesLists() {
         ObservableList<City> obCities = FXCollections.observableArrayList();
-        List<City> cities = CitiesRepository.getInstance().getAll();
+        List<City> cities = CityFacade.getCities();
         obCities.add(0, new City());
         obCities.addAll(cities);
         this.cityListCalendar.setItems(obCities);
@@ -124,7 +123,7 @@ public class CarrierFormController {
 
     // Обработчики событий
     public void saveProfile() {
-        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        User currentUser = UserFacade.getLoggedUser();
         currentUser.setEmail(email.getText());
         currentUser.setPhone(phone.getText());
         currentUser.setName(fullName.getText());
@@ -137,7 +136,7 @@ public class CarrierFormController {
     }
 
     public void loadProfile() {
-        User currentUser = UsersRepository.getInstance().getCurrentUserObject();
+        User currentUser = UserFacade.getLoggedUser();
         email.setText(currentUser.getEmail());
         fullName.setText(currentUser.getName());
         phone.setText(currentUser.getPhone());
@@ -159,7 +158,7 @@ public class CarrierFormController {
         if (calendar.getCityId() == 0) {
             cityListCalendar.getSelectionModel().select(0);
         } else {
-            City city = CitiesRepository.getInstance().getById(calendar.getCityId());
+            City city = CityFacade.getCityById(calendar.getCityId());
             cityListCalendar.getSelectionModel().select(city);
         }
     }
